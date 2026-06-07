@@ -35,6 +35,9 @@ import com.jobportal.backend.security.JwtUtil;
 import com.jobportal.backend.service.AiService;
 import com.jobportal.backend.util.ResumeParser;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
@@ -47,12 +50,11 @@ public class ResumeController {
 	private InterviewQuestionRepository interviewRepository;
 	private final JwtUtil jwtUtil;
 	private final JobRepository jobRepository;
-
-	
+	private final Cloudinary cloudinary;
 
 	public ResumeController(UserRepository userRepository, AiService aiService,
 			ResumeAnalysisRepository analysisRepository, InterviewQuestionRepository interviewRepository,
-			JwtUtil jwtUtil, JobRepository jobRepository) {
+			JwtUtil jwtUtil, JobRepository jobRepository, Cloudinary cloudinary) {
 		super();
 		this.userRepository = userRepository;
 		this.aiService = aiService;
@@ -60,54 +62,40 @@ public class ResumeController {
 		this.interviewRepository = interviewRepository;
 		this.jwtUtil = jwtUtil;
 		this.jobRepository = jobRepository;
+		this.cloudinary = cloudinary;
 	}
 
-	@PostMapping(value ="/upload", consumes = "multipart/form-data")
+	@PostMapping(value = "/upload", consumes = "multipart/form-data")
 	public ResponseEntity<?> uploadResume(
 	        @RequestParam("file") MultipartFile file) {
 
 	    try {
 
-	        System.out.println("FILE = " + file.getOriginalFilename());
-
-	        if (file.isEmpty()) {
-	            return ResponseEntity.badRequest()
-	                    .body("File is empty");
-	        }
-
-	        File uploadDir = new File("uploads/");
-
-	        if (!uploadDir.exists()) {
-	            uploadDir.mkdirs();
-	        }
-
-	        String fileName =
-	                System.currentTimeMillis()
-	                + "_"
-	                + file.getOriginalFilename();
-
-	        Path uploadPath = Paths.get(System.getProperty("user.dir"), "uploads");
-	        Files.createDirectories(uploadPath);
-
-	        Path filePath = uploadPath.resolve(fileName);
-	        Files.write(filePath, file.getBytes());
-	        
-	        String email =
-	                SecurityContextHolder
+	        String email = SecurityContextHolder
 	                .getContext()
 	                .getAuthentication()
 	                .getName();
 
-	        User user =
-	                userRepository.findByEmail(email)
+	        User user = userRepository.findByEmail(email)
 	                .orElseThrow(() ->
 	                        new RuntimeException("User not found"));
 
-	        user.setResumeUrl(filePath.toString());
+	        Map uploadResult = cloudinary.uploader().upload(
+	                file.getBytes(),
+	                ObjectUtils.asMap(
+	                        "resource_type", "raw",
+	                        "folder", "resumeanalyzer"
+	                )
+	        );
+
+	        String fileUrl =
+	                uploadResult.get("secure_url").toString();
+
+	        user.setResumeUrl(fileUrl);
 
 	        userRepository.save(user);
 
-	        return ResponseEntity.ok("Resume uploaded");
+	        return ResponseEntity.ok(fileUrl);
 
 	    } catch (Exception e) {
 
@@ -142,7 +130,7 @@ public class ResumeController {
 	        File file = new File(filePath);
 
 	        return ResponseEntity.ok(
-	                file.getName()
+	                user.getResumeUrl()
 	        );
 
 	    } catch (Exception e) {
@@ -154,7 +142,7 @@ public class ResumeController {
 	    }
 	}
 	
-	@GetMapping("/view/{fileName}")
+	@GetMapping("/view")
 	public ResponseEntity<?> viewResume(@PathVariable String fileName) {
 
 	    try {
