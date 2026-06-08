@@ -90,8 +90,12 @@ public class ResumeController {
 
 	        String fileUrl =
 	                uploadResult.get("secure_url").toString();
+	        
+	        String publicId =
+	        	    uploadResult.get("public_id").toString();
 
 	        user.setResumeUrl(fileUrl);
+	        user.setResumePublicId(publicId);
 
 	        userRepository.save(user);
 

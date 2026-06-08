@@ -29,6 +29,9 @@ public class User {
     
     @Column(name = "resume_url")
     private String resumeUrl;
+    
+    @Column(name = "resume_publicID")
+    private String resumePublicId;
 
     @Enumerated(EnumType.STRING)
     private Role role;
