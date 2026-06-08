@@ -83,9 +83,8 @@ public class ResumeController {
 	        Map uploadResult = cloudinary.uploader().upload(
 	                file.getBytes(),
 	                ObjectUtils.asMap(
-	                        "resource_type", "raw",
-	                        "folder", "resumeanalyzer"
-	                )
+	                	    "resource_type", "auto"
+	                	)
 	        );
 
 	        String fileUrl =
