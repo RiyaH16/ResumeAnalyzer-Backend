@@ -86,9 +86,12 @@ public class ResumeController {
 	                	    "resource_type", "auto"
 	                	)
 	        );
+	        System.out.println(uploadResult);
 
 	        String fileUrl =
 	                uploadResult.get("secure_url").toString();
+	        
+	        System.out.println("FILE URL = " + fileUrl);
 	        
 	        String publicId =
 	        	    uploadResult.get("public_id").toString();

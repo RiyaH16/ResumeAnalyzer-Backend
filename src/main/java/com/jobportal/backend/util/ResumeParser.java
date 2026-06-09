@@ -1,26 +1,29 @@
 package com.jobportal.backend.util;
 
-import java.net.URL;
+import java.net.URI;
 
 import org.apache.tika.Tika;
 
 public class ResumeParser {
 
-    public static String extractText(String fileUrl) {
+	public static String extractText(String fileUrl) {
 
-        try {
+	    try {
 
-            Tika tika = new Tika();
+	        Tika tika = new Tika();
 
-            return tika.parseToString(new URL(fileUrl));
+	        return tika.parseToString(
+	                URI.create(fileUrl).toURL()
+	        );
 
-        } catch (Exception e) {
+	    } catch (Exception e) {
 
-            e.printStackTrace();
+	        e.printStackTrace();
 
-            throw new RuntimeException(
-                    "Error parsing resume"
-            );
-        }
-    }
+	        throw new RuntimeException(
+	                "Error parsing resume: " + e.getMessage()
+	        );
+	    }
+	}
+
 }
