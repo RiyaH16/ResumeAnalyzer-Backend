@@ -112,6 +112,50 @@ public class ResumeController {
 	    }
 	}
 	
+	@DeleteMapping("/delete")
+	public ResponseEntity<?> deleteResume() {
+
+	    try {
+
+	        String email = SecurityContextHolder
+	                .getContext()
+	                .getAuthentication()
+	                .getName();
+
+	        User user = userRepository
+	                .findByEmail(email)
+	                .orElseThrow(() ->
+	                        new RuntimeException("User not found"));
+
+	        if (user.getResumePublicId() != null) {
+
+	            cloudinary.uploader().destroy(
+	                    user.getResumePublicId(),
+	                    ObjectUtils.asMap(
+	                            "resource_type", "raw"
+	                    )
+	            );
+	        }
+
+	        user.setResumeUrl(null);
+	        user.setResumePublicId(null);
+	        user.setResumeAnalysis(null);
+
+	        userRepository.save(user);
+
+	        return ResponseEntity.ok(
+	                "Resume deleted successfully"
+	        );
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        return ResponseEntity.status(500)
+	                .body("Failed to delete resume");
+	    }
+	}
+	
 	@GetMapping("/my-resume")
 	public ResponseEntity<?> getMyResume() {
 
