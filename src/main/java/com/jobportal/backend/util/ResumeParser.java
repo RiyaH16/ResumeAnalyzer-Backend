@@ -1,6 +1,5 @@
 package com.jobportal.backend.util;
 
-import java.io.InputStream;
 import java.net.URL;
 
 import org.apache.tika.Tika;
@@ -13,9 +12,7 @@ public class ResumeParser {
 
             Tika tika = new Tika();
 
-            InputStream inputStream = new URL(fileUrl).openStream();
-
-            return tika.parseToString(inputStream);
+            return tika.parseToString(new URL(fileUrl));
 
         } catch (Exception e) {
 
