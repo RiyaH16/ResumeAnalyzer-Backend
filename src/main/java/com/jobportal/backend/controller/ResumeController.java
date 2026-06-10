@@ -360,6 +360,15 @@ public class ResumeController {
 	""".formatted(jobRole, resumeText);
 
 	        String response = aiService.askAI(prompt);
+	        
+	        if (response != null && !response.isBlank()) {
+
+	            user.setCoverLetterCount(
+	                user.getCoverLetterCount() + 1
+	            );
+
+	            userRepository.save(user);
+	        }
 
 	        return ResponseEntity.ok(response);
 

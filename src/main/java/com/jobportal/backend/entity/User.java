@@ -32,6 +32,10 @@ public class User {
     
     @Column(name = "resume_publicID")
     private String resumePublicId;
+    
+    @Builder.Default
+    @Column(name = "cover_letter_count")
+    private int coverLetterCount = 0;
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -40,6 +44,6 @@ public class User {
     private String resumeAnalysis;
     
     
-	
+    
     
 }
