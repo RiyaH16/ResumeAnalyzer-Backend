@@ -34,8 +34,8 @@ public class User {
     private String resumePublicId;
     
     @Builder.Default
-    @Column(name = "cover_letter_count")
-    private int coverLetterCount = 0;
+    @Column(nullable = false, name = "cover_letter_count")
+    private Integer coverLetterCount = 0;
 
     @Enumerated(EnumType.STRING)
     private Role role;
