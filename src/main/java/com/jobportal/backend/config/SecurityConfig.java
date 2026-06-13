@@ -21,35 +21,56 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http
+    ) throws Exception {
 
         http
             .cors(cors -> {})
+
             .csrf(csrf -> csrf.disable())
-            
+
             .headers(headers ->
-            headers.frameOptions(frame -> frame.disable())
-        )
+                headers.frameOptions(
+                    frame -> frame.disable()
+                )
+            )
 
             .sessionManagement(sess ->
-                sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                sess.sessionCreationPolicy(
+                    SessionCreationPolicy.STATELESS
+                )
             )
 
             .authorizeHttpRequests(auth -> auth
 
-            	    .requestMatchers(
-            	            "/auth/**",
-            	            "/resume/view/**",
-            	            "/error"
-            	    ).permitAll()
+                .requestMatchers(
+                	"/",
+                    "/error",
+                    "/auth/**"
+                    
+                ).permitAll()
 
-            	    .requestMatchers("/resume/**")
-            	    .authenticated()
+                .requestMatchers(
+                        "/resume/**"
+                    ).authenticated()
 
-            	    .anyRequest().authenticated()
-            	)
+                    .requestMatchers(
+                        "/user/**"
+                    ).authenticated()
 
-            .httpBasic(Customizer.withDefaults())
+                .anyRequest()
+                .authenticated()
+            )
+
+            .httpBasic(
+                httpBasic -> httpBasic.disable()
+            )
+            
+            .formLogin(
+                form -> form.disable()
+            )
+
             .addFilterBefore(
                 jwtFilter,
                 UsernamePasswordAuthenticationFilter.class

@@ -34,3 +34,5 @@ build/
 
 uploads/
 target/
+
+src/main/resources/application-secret.properties

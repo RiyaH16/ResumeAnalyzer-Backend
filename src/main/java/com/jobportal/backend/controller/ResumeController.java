@@ -307,7 +307,7 @@ public class ResumeController {
 	    );
 	}
 	
-	@DeleteMapping("/history")
+	@DeleteMapping("/delete-history")
 	public ResponseEntity<?> deleteHistory() {
 
 	    String email = SecurityContextHolder
